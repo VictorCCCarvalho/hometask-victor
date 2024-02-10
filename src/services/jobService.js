@@ -39,7 +39,6 @@ class JobService{
             includeContractWhere[this.Op.or].push({ContractorId: contractorId});
         }
 
-        console.log('aquiiiiiiiiiiiiiiii')
         if (paid !== null) {
             if (paid) {
                 where.paid = true;
