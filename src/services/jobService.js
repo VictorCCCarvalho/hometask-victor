@@ -1,8 +1,9 @@
 class JobService{
-    constructor(jobRepository, sequelize, Op) {
+    constructor(jobRepository, sequelize, Op, Profile) {
         this.jobRepository = jobRepository;
         this.sequelize = sequelize;
         this.Op = Op;
+        this.Profile = Profile;
     }
 
     async retrieveUnpaidJobs(clientId, contractorId, transaction = null) {
@@ -11,8 +12,23 @@ class JobService{
             clientId,
             contractorId,
             paid: false,
-            transaction
+            transaction,
+            includeClient: false,
+            includeContractor: false,
         });
+    }
+
+    async retrievePaidJobs(startDate, endDate, type) {
+        let includeContractAndNotClient = type !== 'client';
+
+        return await this.retrieveJobs({
+            terminated: true,
+            includeClient: !includeContractAndNotClient,
+            includeContractor: includeContractAndNotClient,
+            paid: true,
+            startDate,
+            endDate
+        })
     }
 
     async retrieveJobs({
@@ -20,7 +36,11 @@ class JobService{
                            clientId = null,
                            contractorId = null,
                            paid = null,
-                           transaction = null
+                           transaction = null,
+                           includeClient = false,
+                           includeContractor = false,
+                           startDate = null,
+                           endDate = null
                        }){
         let includeContractWhere = {};
         const where = {};
@@ -51,7 +71,22 @@ class JobService{
             }
         }
 
-        return  this.jobRepository.fetchJobsFromDatabase(includeContractWhere, where, transaction);
+        const includeProfile = [];
+        if (includeClient) {
+            includeProfile.push({model: this.Profile, as: 'Client'});
+        }
+
+        if (includeContractor) {
+            includeProfile.push({model: this.Profile, as: 'Contractor'});
+        }
+
+        if (startDate && endDate) {
+            where.paymentDate = {
+                [this.Op.between]: [startDate, endDate]
+            };
+        }
+
+        return  this.jobRepository.fetchJobsFromDatabase(includeContractWhere, where, transaction, includeProfile);
     }
 
 
