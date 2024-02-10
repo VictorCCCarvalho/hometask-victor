@@ -31,7 +31,7 @@ describe('JobService', () => {
             await jobService.retrieveUnpaidJobs(clientId, contractorId);
 
             expect(jobRepositoryMock.fetchJobsFromDatabase).toHaveBeenCalledWith(
-                {'status': {'undefined': 'terminated'}, 'undefined': [{'ClientId': 123}, {'ContractorId': 456}]}, {'paid': {'undefined': [false, null]}}
+                {'status': {'undefined': 'terminated'}, 'undefined': [{'ClientId': 123}, {'ContractorId': 456}]}, {'paid': {'undefined': [false, null]}}, null
             );
         });
     });
