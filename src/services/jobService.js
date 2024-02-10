@@ -5,12 +5,13 @@ class JobService{
         this.Op = Op;
     }
 
-    async retrieveUnpaidJobs(clientId, contractorId) {
+    async retrieveUnpaidJobs(clientId, contractorId, transaction = null) {
         return await this.retrieveJobs({
             terminated: false,
             clientId,
             contractorId,
-            paid: false
+            paid: false,
+            transaction
         });
     }
 
@@ -18,7 +19,8 @@ class JobService{
                            terminated = false,
                            clientId = null,
                            contractorId = null,
-                           paid = null
+                           paid = null,
+                           transaction = null
                        }){
         let includeContractWhere = {};
         const where = {};
@@ -49,7 +51,7 @@ class JobService{
             }
         }
 
-        return  this.jobRepository.fetchJobsFromDatabase(includeContractWhere, where);
+        return  this.jobRepository.fetchJobsFromDatabase(includeContractWhere, where, transaction);
     }
 
 

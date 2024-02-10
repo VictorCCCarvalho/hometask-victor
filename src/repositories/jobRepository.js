@@ -1,12 +1,13 @@
 const {Job, Contract, Profile} = require('../model');
 
-async function fetchJobsFromDatabase(includeContractWhere=null, where){
+async function fetchJobsFromDatabase(includeContractWhere=null, where, transaction=null){
     return await Job.findAll({
         include: [{
             model: Contract,
             where: includeContractWhere
         }],
-        where: where
+        where: where,
+        transaction: transaction
     });
 }
 
